@@ -1,0 +1,5 @@
+This is a test of a text editor that I am making.
+
+Right now, it is very very simple, but hopefully I'll add some more features soon!
+
+Right now these are the chars I can print pretty much any utf-8 chara

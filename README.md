@@ -21,6 +21,7 @@ Now you might be wondering what will you be able to do in this text editor?
 
 That's it for the features I am planning to add now, but here are some potential ideas for improvement 😁
 
-- Translate it to some lower level language such as C++
-- Add command mode
+- Translate it to some lower level language such as C++d
 - Multi Cursors
+- Ctrl + F 🤔
+- Replace
