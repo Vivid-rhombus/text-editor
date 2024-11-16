@@ -122,6 +122,16 @@ export default class gapBuffer {
 		this.moveRight(cursorX - 1);
 	}
 
+	home() {
+		this.moveLeft(this.cursor.x - 1);
+	}
+
+	end() {
+		const i = this.right.indexOf('\n');
+		const newlineIndex = i < 0 ? this.right.length : i;
+		this.moveRight(newlineIndex);
+	}
+
 	moveCursor(index: number) {
 		if (index < this.gap) {
 			this.moveLeft(this.gap - index);
@@ -131,15 +141,17 @@ export default class gapBuffer {
 	}
 
 	pop() {
-		const isEmpty = this.left.length === 0;
-		const val = this.left.pop();
-		const lastNewline = this.left.findLastIndex(
-			(char: string) => char === '\n'
-		);
-		const adjustedIndex = this.left.length - lastNewline;
-		this.cursor.moveLeft();
-		this.gap += isEmpty ? 0 : -1;
-		if (val === '\n') this.cursor.decrementNewline(adjustedIndex);
+		const val = this.left.pop() || '';
+		this.gap = this.left.length;
+		if (val === '\n') {
+			const lastNewline = this.left.findLastIndex(
+				(char: string) => char === '\n'
+			);
+			const adjustedIndex = this.left.length - lastNewline - 1;
+			this.cursor.decrementNewline(adjustedIndex);
+		} else if (val) {
+			this.cursor.moveLeft();
+		}
 	}
 
 	push(input: string) {

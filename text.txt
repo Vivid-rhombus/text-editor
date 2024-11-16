@@ -1,2 +1,4 @@
-abcde
-aa
+This is a test of cursor control.
+
+I have multiple lines, of multiple lengths,
+and am able to jump between them.

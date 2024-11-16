@@ -39,9 +39,15 @@ const saveToDisk = () => {
 };
 
 // process.stdout.write(rope.toString() + chalk.bgBlue(' '));
+if (debug) {
+	console.log(chalk.bgYellow('DEBUG MODE'));
+	rope.cursor.y++;
+}
+console.clear();
 process.stdout.write(rope.toString());
 
 process.stdin.on('data', (inputBuffer) => {
+	process.stdout.write(Buffer.from('\u001B[?25l')); // Hide default cursor
 	console.clear();
 	cursorLit = true;
 	const inputIterator = inputBuffer.values();
@@ -53,7 +59,6 @@ process.stdin.on('data', (inputBuffer) => {
 	if (debug) console.log(inputString); // Print charcode of last char inserted for debug purposes
 	if (inputString === map.ctrlq || inputString === map.ctrlc) {
 		// Ctrl + Q / C to quit
-		// process.stdout.write(Buffer.from('\u001B[?25h')); // Show default cursor
 		process.exit();
 	}
 	if (inputString === map.ctrls) saveToDisk(); // Save to disk
@@ -82,8 +87,13 @@ process.stdin.on('data', (inputBuffer) => {
 	if (inputString === map.down) {
 		rope.moveDown();
 	}
-
-	// process.stdout.write(rope.toString() + chalk.bgBlue(' '));
+	if (inputString === map.home) {
+		rope.home();
+	}
+	if (inputString === map.end) {
+		rope.end();
+	}
+	process.stdout.write(Buffer.from('\u001B[?25h')); // Show default cursor
 	process.stdout.write(
 		rope.toString() + `\x1b[${rope.cursor.y};${rope.cursor.x}H`
 	);
