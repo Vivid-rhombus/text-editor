@@ -1,9 +1,3 @@
-// import { FlatRope | ConcatenationRope } from './ropeUtils';
-
-const SPLIT_LEN = 1000;
-const JOIN_LEN = 500;
-const BALANCE_RATIO = 1.2;
-
 const FIBONNACI = [
 	0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584,
 	4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229,
@@ -25,25 +19,21 @@ const FIBONNACI = [
 const MAX_ROPE_DEPTH = 96;
 const COMBINE_LENGTH = 17;
 
-interface Rope {
+export interface Rope {
 	/// <summary>
 	/// Returns a new rope created by appending the specified string to
 	/// this rope
 	/// </summary>
 	/// <param name="suffix">the sequence to append</param>
 	/// <returns>a new rope</returns>
-	append(
-		appendItem: string | FlatRope | ConcatenationRope,
-		start?: number,
-		end?: number
-	): FlatRope | ConcatenationRope;
+	Append(appendItem: string | Rope, start?: number, end?: number): Rope;
 
 	/// <summary>
 	/// Get the characters at the given index
 	/// </summary>
 	/// <param name="index">the index to look up</param>
 	/// <returns>the character at the given index</returns>
-	charAt(index: number): string;
+	CharAt(index: number): string;
 
 	/// <summary>
 	/// Creates a new rope by deleting the specified character substring.
@@ -56,7 +46,7 @@ interface Rope {
 	/// <param name="start">the beginning index, inclusive</param>
 	/// <param name="end">the ending index, inclusive</param>
 	/// <returns>this rope</returns>
-	remove(start: number, end: number): FlatRope | ConcatenationRope;
+	Remove(start: number, end: number): Rope;
 
 	/// <summary>
 	/// Creates a new rope by inserting the specified string into this
@@ -67,7 +57,7 @@ interface Rope {
 	/// <param name="dstOffset">the offset</param>
 	/// <param name="s">the sequence to be inserted</param>
 	/// <returns>a new rope</returns>
-	insert(str: string, offset: number): FlatRope | ConcatenationRope;
+	Insert(str: string, offset: number): Rope;
 
 	/// <summary>
 	/// Returns the count of characters included in this rope
@@ -81,7 +71,7 @@ interface Rope {
 	/// to give users more control
 	/// </summary>
 	/// <returns>a rebalanced rope</returns>
-	rebalance(): FlatRope | ConcatenationRope;
+	rebalance(): Rope;
 
 	/// <summary>
 	/// Returns a new rope denoting the subsequence from position start to
@@ -90,7 +80,7 @@ interface Rope {
 	/// <param name="start">the starting position</param>
 	/// <param name="end">end ending position</param>
 	/// <returns>a new rope denoting the subsequence</returns>
-	subSequence(start: number, end?: number): FlatRope | ConcatenationRope;
+	SubSequence(start: number, end?: number): Rope;
 
 	/// <summary>
 	/// Tells whether the length of the rope is zero.
@@ -102,7 +92,7 @@ interface Rope {
 	/// Reverses this rope
 	/// </summary>
 	/// <returns>a reversed copy of this rope</returns>
-	// FlatRope | ConcatenationRope Reverse();
+	// Rope Reverse();
 
 	/// <summary>
 	/// Returns an enumerator positioned to start at the specified index
@@ -113,7 +103,7 @@ interface Rope {
 
 	/// <summary>
 	/// Returns an enumerator positioned to start from the specified index
-	/// and move backward through the FlatRope | ConcatenationRope
+	/// and move backward through the Rope
 	/// </summary>
 	/// <param name="start">the starting index</param>
 	/// <returns>An enumerator positioned to start at the specified index
@@ -135,19 +125,19 @@ interface Rope {
 	/// Trims all whitespace from the beginning and end of this rope
 	/// </summary>
 	/// <returns>a whitespace-trimmed rope</returns>
-	// FlatRope | ConcatenationRope Trim();
+	// Rope Trim();
 
 	/// <summary>
 	/// Trims all whitespace from the end of this rope
 	/// </summary>
 	/// <returns>a rope with all trailing whitespace removed</returns>
-	// FlatRope | ConcatenationRope TrimEnd();
+	// Rope TrimEnd();
 
 	/// <summary>
 	/// Trims all whitespace from the beginning of this string
 	/// </summary>
 	/// <returns>a rope with all leading whitespace trimmed</returns>
-	// FlatRope | ConcatenationRope TrimStart();
+	// Rope TrimStart();
 
 	/// <summary>
 	/// Increase the length of this rope to the specified length by prepending
@@ -156,7 +146,7 @@ interface Rope {
 	/// </summary>
 	/// <param name="toLength">the desired length</param>
 	/// <returns>the padded rope</returns>
-	// FlatRope | ConcatenationRope PadStart(int toLength);
+	// Rope PadStart(int toLength);
 
 	/// <summary>
 	/// Increase the length of this rope to the specified length by repeatedly
@@ -166,7 +156,7 @@ interface Rope {
 	/// <param name="toLength">the desired length</param>
 	/// <param name="padChar">the character to use for padding</param>
 	/// <returns>the padded rope</returns>
-	// FlatRope | ConcatenationRope PadStart(int toLength, char padChar);
+	// Rope PadStart(int toLength, char padChar);
 
 	/// <summary>
 	/// Increase the length of this rope to the specified length by appending
@@ -175,7 +165,7 @@ interface Rope {
 	/// </summary>
 	/// <param name="toLength">the desired length</param>
 	/// <returns>the padded rope</returns>
-	// FlatRope | ConcatenationRope PadEnd(int toLength);
+	// Rope PadEnd(int toLength);
 
 	/// <summary>
 	/// Increase the length of this rope to the specified length by repeatedly
@@ -185,7 +175,7 @@ interface Rope {
 	/// <param name="toLength">the desired length</param>
 	/// <param name="padChar">the character to use for padding</param>
 	/// <returns>the padded rope</returns>
-	// FlatRope | ConcatenationRope PadEnd(int toLength, char padChar);
+	// Rope PadEnd(int toLength, char padChar);
 
 	/// <summary>
 	/// Tells whether the rope starts with the specified prefix
@@ -219,151 +209,121 @@ interface Rope {
 	// bool EndsWith(String suffix, int offset);
 }
 
-function autoRebalance(
-	r: FlatRope | ConcatenationRope
-): FlatRope | ConcatenationRope {
-	if (
-		r instanceof AbstractRope &&
-		(r as AbstractRope).Depth() > MAX_ROPE_DEPTH
-	) {
-		return rebalance(r);
-	}
-	return r;
-}
+// function autoRebalance(r: Rope): Rope {
+// 	if (
+// 		r instanceof AbstractRope &&
+// 		(r as AbstractRope).Depth() > MAX_ROPE_DEPTH
+// 	) {
+// 		return rebalance(r);
+// 	}
+// 	return r;
+// }
 
-function rebalance(
-	r: FlatRope | ConcatenationRope
-): FlatRope | ConcatenationRope {
-	const leafNodes: FlatRope[] = [];
-	const toExamine: (FlatRope | ConcatenationRope)[] = [];
+// function rebalance(r: Rope): Rope {
+// 	const leafNodes: FlatRope[] = [];
+// 	const toExamine: (FlatRope | ConcatenationRope)[] = [];
 
-	toExamine.push(r);
-	while (toExamine.length > 0) {
-		const rExamine = toExamine.pop();
-		if (rExamine instanceof ConcatenationRope) {
-			toExamine.push(rExamine.right);
-			toExamine.push(rExamine.left);
-			continue;
-		}
-		leafNodes.push(rExamine as FlatRope);
-	}
+// 	toExamine.push(r);
+// 	while (toExamine.length > 0) {
+// 		const rExamine = toExamine.pop();
+// 		if (rExamine instanceof ConcatenationRope) {
+// 			toExamine.push(rExamine.right);
+// 			toExamine.push(rExamine.left);
+// 			continue;
+// 		}
+// 		leafNodes.push(rExamine);
+// 	}
 
-	const result: FlatRope | ConcatenationRope = merge(
-		leafNodes,
-		0,
-		leafNodes.length
-	);
-	return result;
-}
+// 	const result: Rope = merge(leafNodes, 0, leafNodes.length);
+// 	return result;
+// }
 
-function merge(
-	leafNodes: FlatRope[],
-	start: number,
-	end: number
-): FlatRope | ConcatenationRope {
-	const range = end - start;
-	switch (range) {
-		case 1:
-			return leafNodes[start];
-		case 2:
-			return new ConcatenationRope(leafNodes[start], leafNodes[start + 1]);
-		default:
-			const middle = Math.floor(start + range / 2);
-			return new ConcatenationRope(
-				merge(leafNodes, start, middle),
-				merge(leafNodes, middle, end)
-			);
-	}
-}
+// function merge(leafNodes: FlatRope[], start: number, end: number): Rope {
+// 	const range = end - start;
+// 	switch (range) {
+// 		case 1:
+// 			return leafNodes[start];
+// 		case 2:
+// 			return new ConcatenationRope(leafNodes[start], leafNodes[start + 1]);
+// 		default:
+// 			const middle = Math.floor(start + range / 2);
+// 			return new ConcatenationRope(
+// 				merge(leafNodes, start, middle) + merge(leafNodes, middle, end)
+// 			);
+// 	}
+// }
 
-function concatenate(
-	left: FlatRope | ConcatenationRope,
-	right: FlatRope | ConcatenationRope
-): FlatRope | ConcatenationRope {
-	if (left.Length() == 0) return right;
-	if (right.Length() == 0) return left;
+// function Concatenate(left: Rope, right: Rope): Rope {
+// 	if (left.Length() == 0) return right;
+// 	if (right.Length() == 0) return left;
 
-	if (left.Length() + right.Length() < COMBINE_LENGTH) {
-		return new FlatRope(left.toString() + right.toString());
-	} else if (!(left instanceof ConcatenationRope)) {
-		if (right instanceof ConcatenationRope) {
-			const cRight: ConcatenationRope = right;
-			if (left.Length() + cRight.left.Length() < COMBINE_LENGTH)
-				return autoRebalance(
-					new ConcatenationRope(
-						new FlatRope(left.toString() + cRight.left.toString()),
-						cRight.right
-					)
-				);
-		}
-	} else if (!(right instanceof ConcatenationRope)) {
-		if (left instanceof ConcatenationRope) {
-			const cLeft: ConcatenationRope = left;
-			if (right.Length() + cLeft.right.Length() < COMBINE_LENGTH)
-				return autoRebalance(
-					new ConcatenationRope(
-						cLeft.left,
-						new FlatRope(cLeft.right.toString() + right.toString())
-					)
-				);
-		}
-	}
+// 	if (left.Length() + right.Length() < COMBINE_LENGTH) {
+// 		return new FlatRope(left.ToString() + right.ToString());
+// 	} else if (!(left instanceof ConcatenationRope)) {
+// 		if (right instanceof ConcatenationRope) {
+// 			const cRight: ConcatenationRope = right;
+// 			if (left.Length() + cRight.GetLeft().Length() < COMBINE_LENGTH)
+// 				return autoRebalance(
+// 					new ConcatenationRope(
+// 						new FlatRope(left.toString(), cRight.left.toString()),
+// 						cRight.right
+// 					)
+// 				);
+// 		}
+// 	} else if (!(right instanceof ConcatenationRope)) {
+// 		if (left instanceof ConcatenationRope) {
+// 			const cLeft: ConcatenationRope = left;
+// 			if (right.Length() + cLeft.GetRight().Length() < COMBINE_LENGTH)
+// 				return autoRebalance(
+// 					new ConcatenationRope(
+// 						cLeft.GetLeft(),
+// 						new FlatRope(cLeft.right.toString(), right.toString())
+// 					)
+// 				);
+// 		}
+// 	}
 
-	return autoRebalance(new ConcatenationRope(left, right));
-}
+// 	return AutoRebalance(new ConcatenationRope(left, right));
+// }
 
-abstract class AbstractRope {
-	// append(
-	// 	appendItem: string | FlatRope | ConcatenationRope,
-	// 	start?: number,
-	// 	end?: number
-	// ) {
-	// 	if (typeof appendItem === 'string') {
-	// 		if (start && end) {
-	// 			return concatenate(this, RopeBuilder.BUILD(suffix).SubSequence(start, end));
-	// 		}
-	// 		// return RopeUtilities.INSTANCE.Concatenate(this, RopeBuilder.BUILD(suffix));
-	// 	}
-	// 	// return RopeUtilities.INSTANCE.Concatenate(this, rope);
-	// }
-
-	remove(start: number, end: number) {
-		if (start == end) {
-			return this;
-		} else if (start > end) {
-			throw new RangeError(`start ${start} less than end ${end}`);
+class RopeIterator {
+	constructor(rope) {
+		const stack = [];
+		let node = rope.root;
+		while (node) {
+			this.stack.push(node);
+			node = node.left;
 		}
 
-		// return SubSequence(0, start).append(
-		// 	SubSequence(end, this.Length()).ToString()
-		// );
+		this.rope = rope;
+		this.stack = stack;
 	}
 
-	isEmpty() {
-		return this.Length() === 0;
+	next() {
+		const res = this.stack.pop();
+		if (this.stack.length > 0) {
+			const parent = this.stack.pop();
+			const right = parent.right;
+			if (right) {
+				this.stack.push(right);
+				let left = right.left;
+				while (left) {
+					this.stack.push(left);
+					left = left.left;
+				}
+			}
+		}
+		return res;
 	}
-
-	abstract Length(): number;
-	abstract Depth(): number;
-	// abstract getEnumerator(): unknown; // enumerator
-	rebalance(): AbstractRope {
-		return this;
-	}
-
-	abstract CharAt(index: number): string;
-	abstract Append(): FlatRope | ConcatenationRope;
-
-	abstract Remove(start: number, end: number): FlatRope | ConcatenationRope;
-
-	abstract Insert(str: string, offset: number): FlatRope | ConcatenationRope;
-
-	abstract SubSequence(
-		start: number,
-		end: number
-	): FlatRope | ConcatenationRope;
 }
 
-class FlatRope {
+abstract class RopeNode {
+	abstract length: number;
+	abstract left: LeafNode | ConcatNode;
+	abstract right: LeafNode | ConcatNode;
+}
+
+class LeafNode {
 	length: number;
 	str: string;
 
@@ -380,29 +340,31 @@ class FlatRope {
 		return 0;
 	}
 
-	IndexOf(str: string, offset: number = 0) {
-		return this.str.indexOf(str, offset);
-	}
-
-	subSequence(start: number = 0, end: number = 0) {
-		if (start == 0 && end == this.Length()) return this;
-		else if (end - start < 16) {
-			return this.str.substr(start, end - start);
-		} else {
-			return new SubStringRope(this, start, end - start);
+	substring(start: number = 0, end: number = 0): LeafNode {
+		if (start > this.length) {
+			start = this.length;
+			end = this.length;
 		}
+		if (end > this.length) {
+			end = this.length;
+		}
+
+		if (start === 0 && end === this.length) {
+			return this;
+		}
+		return new LeafNode(this.str.substring(start, end));
 	}
 
 	toString() {
 		return this.str;
 	}
 
-	isEmpty() {
-		return this.length === 0;
+	concat(str: string) {
+		return new LeafNode(this.str.concat(str));
 	}
 
 	charAt(index: number): string {
-		return '';
+		return this.str.charAt(index);
 	}
 
 	append(
@@ -433,47 +395,107 @@ class FlatRope {
 			this.subSequence(end, this.Length()).toString()
 		);
 	}
-
-	Insert(str: string, offset: number): FlatRope | ConcatenationRope {
-		return new FlatRope();
-	}
 }
 
-class ConcatenationRope extends AbstractRope {
+class ConcatNode {
+	private depth: number;
 	length: number;
-	depth: number;
-	left: FlatRope | ConcatenationRope;
-	right: FlatRope | ConcatenationRope;
+	left: LeafNode | ConcatNode;
+	right: LeafNode | ConcatNode;
 
-	constructor(
-		left: FlatRope | ConcatenationRope,
-		right: FlatRope | ConcatenationRope
-	) {
-		super();
-		this.length = left.Length() + right.Length();
-		this.depth = Math.max(left.Depth(), right.Depth()) + 1;
+	constructor(left: LeafNode | ConcatNode, right: LeafNode | ConcatNode) {
+		this.length = left.length + right.length;
 		this.left = left;
 		this.right = right;
+		this.depth = Math.max(left.Depth(), right.Depth()) + 1;
 	}
 
 	Depth() {
 		return this.depth;
 	}
 
-	Length() {
-		return this.length;
+	substring(start: number = 0, end: number = 0): LeafNode[] {
+		if (start > this.length) {
+			start = this.length;
+			end = this.length;
+		}
+		if (end > this.length) {
+			end = this.length;
+		}
+
+		const leftLength = this.left!.length;
+		const leftStart = Math.min(start, leftLength);
+		const leftEnd = Math.min(end, leftLength);
+		const rightLength = this.right!.length;
+		const rightStart = Math.max(0, Math.min(start - leftLength, rightLength));
+		const rightEnd = Math.max(0, Math.min(end - leftLength, rightLength));
+
+		// options
+		// 1. start and end inside left child.
+		// 2. start in left child and end inside right child.
+		// 3. start and end inside right child.
+
+		if (start === end) {
+			return [new LeafNode()];
+		}
+
+		if (end < leftLength) {
+			return [this.left.substring(leftStart, leftEnd)].flat();
+		}
+		if (start < leftLength && end > leftLength) {
+			return [
+				this.left.substring(leftStart, leftEnd),
+				this.right.substring(rightStart, rightEnd),
+			].flat();
+		}
+
+		return [this.right.substring(rightStart, rightEnd)].flat();
 	}
 
-	SubSequence(start: number = 0, end: number = 0) {
-		if (start < 0 || end > this.length)
-			throw new RangeError('Illegal subsequence (' + start + ',' + end + ')');
-		if (start == 0 && end == this.length) return this;
-		const l = this.left.Length();
-		if (end <= l) return this.left.SubSequence(start, end);
-		if (start >= l) return this.right.SubSequence(start - l, end - l);
-		return concatenate(
-			this.left.SubSequence(start, l),
-			this.right.SubSequence(0, end - l)
+	toString(): string {
+		return this.left.toString() + this.right.toString();
+	}
+
+	charAt(index: number): string {
+		const middle = Math.floor(this.length / 2);
+		if (index < middle) {
+			return this.left.charAt(index);
+		}
+		return this.left.charAt(index - middle);
+	}
+
+	concat(left: ConcatNode | LeafNode): ConcatNode | LeafNode {
+		if (typeof appendItem === 'string') appendItem = new LeafNode(appendItem);
+
+		return this.str.concat(str);
+	}
+	append(
+		appendItem: string | FlatRope | ConcatenationRope,
+		start?: number,
+		end?: number
+	) {
+		//
+		// if (typeof appendItem === 'string') {
+		// 	if (start && end) {
+		// 		return concatenate(
+		// 			this,
+		// 			new FlatRope(appendItem).SubSequence(start, end)
+		// 		);
+		// 	}
+		// 	return concatenate(this, new FlatRope(appendItem));
+		// }
+		// return concatenate(this, appendItem);
+	}
+
+	remove(start: number, end: number) {
+		if (start == end) {
+			return this;
+		} else if (start > end) {
+			throw new RangeError(`start ${start} less than end ${end}`);
+		}
+
+		return this.subSequence(0, start).append(
+			this.subSequence(end, this.Length()).toString()
 		);
 	}
 }
