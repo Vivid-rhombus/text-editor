@@ -5,7 +5,7 @@ import map from './inputCodeMap';
 
 process.stdin.setRawMode(true);
 process.stdin.resume();
-process.stdout.write(Buffer.from('\u001B[?25l')); // hides default cursor
+// process.stdout.write(Buffer.from('\u001B[?25l')); // hides default cursor
 
 const file = fs.readFileSync('./text.txt', 'utf8');
 
@@ -32,13 +32,14 @@ const flickerCursor = () => {
 	return timeoutId;
 };
 
-if (!debug) flickerCursor();
+// if (!debug) flickerCursor();
 
 const saveToDisk = () => {
 	fs.writeFileSync('./text.txt', rope.toString());
 };
 
-process.stdout.write(rope.toString() + chalk.bgBlue(' '));
+// process.stdout.write(rope.toString() + chalk.bgBlue(' '));
+process.stdout.write(rope.toString());
 
 process.stdin.on('data', (inputBuffer) => {
 	console.clear();
@@ -52,7 +53,7 @@ process.stdin.on('data', (inputBuffer) => {
 	if (debug) console.log(inputString); // Print charcode of last char inserted for debug purposes
 	if (inputString === map.ctrlq || inputString === map.ctrlc) {
 		// Ctrl + Q / C to quit
-		process.stdout.write(Buffer.from('\u001B[?25h')); // Show default cursor
+		// process.stdout.write(Buffer.from('\u001B[?25h')); // Show default cursor
 		process.exit();
 	}
 	if (inputString === map.ctrls) saveToDisk(); // Save to disk
@@ -70,14 +71,20 @@ process.stdin.on('data', (inputBuffer) => {
 	}
 
 	if (inputString === map.left) {
+		rope.moveLeft(1);
 	}
-	process.stdout.write(rope.toString() + chalk.bgBlue(' '));
-});
+	if (inputString === map.right) {
+		rope.moveRight(1);
+	}
+	if (inputString === map.up) {
+		rope.moveUp();
+	}
+	if (inputString === map.down) {
+		rope.moveDown();
+	}
 
-/**
- * TO DO:
- *
- * Create cursor object/state manager
- * Add directional key input handling to cursor
- *
- */
+	// process.stdout.write(rope.toString() + chalk.bgBlue(' '));
+	process.stdout.write(
+		rope.toString() + `\x1b[${rope.cursor.y};${rope.cursor.x}H`
+	);
+});

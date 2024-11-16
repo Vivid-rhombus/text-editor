@@ -1,13 +1,52 @@
-const gap_size = 10;
-let gap_left = 0;
-let gap_right = gap_size - gap_left - 1;
-let size = 10;
+// const gap_size = 10;
+// let gap_left = 0;
+// let gap_right = gap_size - gap_left - 1;
+// let size = 10;
+
+class Cursor {
+	x: number;
+	y: number;
+	bufferIndex: number;
+
+	constructor(buffer: string[]) {
+		const [x, y] = buffer.reduce(
+			(acc, char: string): [number, number] => {
+				const [x, y] = acc;
+				if (char === '\n') {
+					return [1, y + 1];
+				}
+				return [x + 1, y];
+			},
+			[1, 1]
+		);
+		this.x = x;
+		this.y = y;
+		this.bufferIndex = buffer.length;
+	}
+
+	moveLeft() {
+		this.x = this.x > 1 ? this.x - 1 : 1;
+	}
+	moveRight() {
+		this.x += 1;
+	}
+
+	incrementNewline() {
+		this.x = 1;
+		this.y += 1;
+	}
+
+	decrementNewline(index: number) {
+		this.y = this.y > 1 ? this.y - 1 : 1;
+		this.x = index > 0 ? index + 1 : 1;
+	}
+}
 
 export default class gapBuffer {
 	left: string[];
 	right: string[];
-	cursor: number;
-	// cursorRight: number;
+	gap: number;
+	cursor: Cursor;
 
 	constructor(str?: string) {
 		if (str) {
@@ -16,47 +55,99 @@ export default class gapBuffer {
 			this.left = [];
 		}
 		this.right = [];
-		this.cursor = this.left.length;
-		// this.cursorRight = 0;
+		this.gap = this.left.length;
+		this.cursor = new Cursor(this.left);
 	}
 
 	moveLeft(length: number) {
 		while (length > 0) {
 			length--;
-			this.cursor--;
-			this.right.unshift(this.left.pop() || '');
+			const val = this.left.pop() || '';
+			this.gap = this.left.length;
+			if (val === '\n') {
+				const lastNewline = this.left.findLastIndex(
+					(char: string) => char === '\n'
+				);
+				const adjustedIndex = this.left.length - lastNewline - 1;
+				this.cursor.decrementNewline(adjustedIndex);
+			} else {
+				this.cursor.moveLeft();
+			}
+			if (val) {
+				this.right.unshift(val);
+			}
 		}
 	}
 
 	moveRight(length: number) {
 		while (length > 0) {
 			length--;
-			this.cursor++;
-			this.left.push(this.right.shift() || '');
+			const val = this.right.shift() || '';
+			if (val === '\n') {
+				this.cursor.incrementNewline();
+			} else {
+				this.cursor.moveRight();
+			}
+			if (val) {
+				this.left.push(val);
+				this.gap = this.left.length;
+			}
 		}
 	}
 
+	moveUp() {
+		const cursorX = this.cursor.x;
+		this.moveLeft(cursorX);
+		const i = this.left.lastIndexOf('\n');
+		// const newlineIndex = i < 0 ? 0 : i;
+		const lineLength = this.left.length - i;
+		if (cursorX >= lineLength) {
+			return;
+		}
+		this.moveLeft(lineLength - cursorX);
+	}
+
+	moveDown() {
+		const cursorX = this.cursor.x;
+		const i = this.right.indexOf('\n');
+		const newlineIndex = i < 0 ? this.right.length : i + 1;
+		this.moveRight(newlineIndex);
+
+		const ni = this.right.indexOf('\n');
+		const nextLineLength = ni < 0 ? this.right.length : ni;
+		if (cursorX >= nextLineLength) {
+			this.moveRight(nextLineLength);
+			return;
+		}
+		this.moveRight(cursorX - 1);
+	}
+
 	moveCursor(index: number) {
-		if (index < this.cursor) {
-			this.moveLeft(this.cursor - index);
+		if (index < this.gap) {
+			this.moveLeft(this.gap - index);
 		} else {
-			this.moveRight(index - this.cursor);
+			this.moveRight(index - this.gap);
 		}
 	}
 
 	pop() {
-		this.moveCursor(this.left.length);
 		const isEmpty = this.left.length === 0;
-		this.left.pop();
-		this.cursor += isEmpty ? 0 : -1;
+		const val = this.left.pop();
+		const lastNewline = this.left.findLastIndex(
+			(char: string) => char === '\n'
+		);
+		const adjustedIndex = this.left.length - lastNewline;
+		this.cursor.moveLeft();
+		this.gap += isEmpty ? 0 : -1;
+		if (val === '\n') this.cursor.decrementNewline(adjustedIndex);
 	}
 
 	push(input: string) {
-		this.moveCursor(this.left.length);
-
 		for (let i = 0; i < input.length; i++) {
-			this.left[this.cursor] = input[i];
-			this.cursor++;
+			this.left.push(input[i]);
+			this.cursor.moveRight();
+			this.gap++;
+			if (input[i] === '\n') this.cursor.incrementNewline();
 		}
 	}
 
